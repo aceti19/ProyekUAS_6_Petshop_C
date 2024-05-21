@@ -1,0 +1,70 @@
+/* .shape {
+    height: 0;
+    width: 0;
+    border-bottom: 30px solid black;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+  } */
+
+
+
+
+/* .container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .bgImage {
+    z-index: -1;
+  }
+
+  .content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+  }
+
+  .logo {
+    / Sesuaikan margin jika perlu /
+  }
+
+  .npmName {
+    margin-top: 8px; / Atur sesuai kebutuhan /
+    font-size: 0.8rem; / Sesuaikan dengan desain Anda /
+  }
+
+  .title {
+    margin-top: 16px; / Atur sesuai kebutuhan /
+    font-size: 2rem; / Sesuaikan dengan desain Anda /
+  }
+
+  .loginButton {
+    margin-top: 24px; / Atur sesuai kebutuhan /
+    padding: 8px 16px; / Sesuaikan dengan desain Anda /
+    background-color: #fff;
+    color: #000;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .loginButton:hover {
+    background-color: #f0f0f0;
+  }
+
+  @media (max-width: 600px) {
+    .content {
+      top: 40%; / Atur posisi lebih ke atas pada layar mobile /
+    }
+
+    .title {
+      font-size: 1.5rem; / Ukuran font lebih kecil untuk layar mobile */
+    /* }
+  }  */
