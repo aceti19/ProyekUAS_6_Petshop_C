@@ -2,6 +2,7 @@
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
 // However, these types are generated automatically if you're using an ORM such as Prisma.
+
 export type User = {
   id: string;
   name: string;
@@ -9,13 +10,6 @@ export type User = {
   password: string;
 };
 
-export type Reservation = {
-  id: string; // Will be created on the database
-  customer_id: string;
-  amount: number; // Stored in cents
-  status: 'pending' | 'paid';
-  date: string;
-};
 export type Customer = {
   id: string;
   name: string;
@@ -37,37 +31,6 @@ export type Revenue = {
   month: string;
   revenue: number;
 };
-
-export type LatestReservations = {
-  id: string;
-  name: string;
-  image_url: string;
-  email: string;
-  amount: string;
-};
-
-export type LatestReservationsRaw = Omit<LatestReservations, 'amount'> & {
-  amount: number;
-};
-
-export type ReservationsTable = {
-  id: string;
-  customer_id: string;
-  name: string;
-  email: string;
-  image_url: string;
-  date: string;
-  amount: number;
-  status: 'pending' | 'paid';
-};
-
-export type ReservationForm = {
-  id: string;
-  customer_id: string;
-  amount: number;
-  status: 'pending' | 'paid';
-};
-
 
 export type LatestInvoice = {
   id: string;
@@ -107,6 +70,7 @@ export type CustomerField = {
   name: string;
 };
 
+
 export type InvoiceForm = {
   id: string;
   customer_id: string;
@@ -121,6 +85,7 @@ export type CustomerForm = {
   email: string;
   image_url: string;
 };
+
 export type Product = {
   product_id: string; // Changed from number to string
   product_name: string;
@@ -129,13 +94,7 @@ export type Product = {
   category: string;
 };
 
-export type Supplier = {
-  supplier_id: string; // Changed from number to string
-  supplier_name: string;
-  contact_person: string;
-  phone_number: string;
-  email: string;
-};
+
 export type supplierTable = {
   supplier_id: string;
   supplier_name: string;
@@ -151,3 +110,76 @@ export type productTable = {
   stock_quantity: number;
   category: string;
 };
+
+export type InvoicesTable = {
+  id: string;
+  customer_id: string;
+  name: string;
+  email: string;
+  image_url: string;
+  date: string;
+  amount: number;
+  status: 'pending' | 'paid';
+};
+
+export type ProductForm = {
+  id: string;
+  name: string;
+  price: number;
+  stock_quantity: number;
+  category: string;
+};
+
+export type ProductsTable = {
+  id: string;
+  name: string;
+  price: number;
+  stock_quantity: number;
+  category: string;
+ 
+};
+
+
+export type SuppliersTable = {
+  id: string;
+  name: string;
+  contact_person: string;
+  phone_number: string;
+  email: string;
+};
+
+// New types for latest suppliers
+export type LatestSupplier = {
+  id: string;
+  name: string;
+  contact_person: string;
+  phone_number: string;
+  email: string;
+};
+
+export type LatestSupplierRaw = Omit<LatestSupplier, 'id'> & {
+  id: string;
+};
+
+export type Supplier = {
+  supplier_id: string;
+  supplier_name: string;
+  contact_person: string;
+  phone_number: string;
+  email: string;
+};
+
+export type SupplierForm = {
+  id: string;
+  name: string;
+  contact_person: string;
+  phone_number: string;
+  email: string;
+};
+
+export type SupplierField = {
+  id: string;
+  name: string;
+};
+
+export type SuppliersTableType = Supplier[];

@@ -2,54 +2,51 @@ import Pagination from '@/app/ui/suppliers/pagination';
 import Search from '@/app/ui/search';
 import Table from '@/app/ui/suppliers/table';
 import { CreateSupplier } from '@/app/ui/suppliers/buttons';
-import { lusitana } from '@/app/ui/fonts';
+import { kanit } from '@/app/ui/fonts';
+import { CreateSupplierSkeleton, SuppliersTableSkeleton, SearchSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchSuppliersPages } from '@/app/lib/data';
-import { SuppliersTableSkeleton, SearchSkeleton, CreateSupplierSkeleton } from '@/app/ui/skeletons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Suppliers',
+    title: 'Suppliers',
 };
 
 export default async function Page({
-  searchParams,
+    searchParams,
 }: {
-  searchParams?: {
-    query?: string;
-    page?: string;
-  };
+    searchParams?: {
+        query?: string;
+        page?: string;
+    };
 }) {
-  const query = searchParams?.query || '';
-  const currentPage = Number(searchParams?.page) || 1;
+    const query = searchParams?.query || '';
+    const currentPage = Number(searchParams?.page) || 1;
 
-  const totalPages = await fetchSuppliersPages(query);
-  
-  return (
-    <div className="w-full p-6 bg-gray-100 min-h-screen">
-      <Suspense fallback={<div className="flex w-full items-center justify-between bg-white p-6 shadow-md rounded-lg"><div className={`${lusitana.className} text-3xl mb-4`}>Loading...</div></div>}>
-        <div className="flex flex-col items-center justify-between bg-white p-6 shadow-md rounded-lg">
-          <h1 className={`${lusitana.className} text-3xl mb-4`}>Suppliers</h1>
-          <div className="flex w-full items-center justify-between gap-4">
-            <Suspense fallback={<SearchSkeleton />}>
-              <Search placeholder="Search suppliers..." />
+    const totalPages = await fetchSuppliersPages(query);
+    return (
+        <div className="w-full">
+            <div className="flex w-full items-center justify-between">
+                <h1 className={`${kanit.className} text-2xl`}>Suppliers</h1>
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
+                <Suspense fallback={<SearchSkeleton />}>
+                    <Search placeholder="Search suppliers..." />
+                </Suspense>
+                <Suspense fallback={<CreateSupplierSkeleton />}>
+                    <CreateSupplier  />
+                </Suspense>
+            </div>
+
+            <Suspense
+                key={query + currentPage}
+                fallback={<SuppliersTableSkeleton />}
+            >
+                <Table query={query} currentPage={currentPage} />
             </Suspense>
-            <Suspense fallback={<CreateSupplierSkeleton />}>
-              <CreateSupplier />
-            </Suspense>
-          </div>
+            <div className="mt-5 flex w-full justify-center">
+                <Pagination totalPages={totalPages}  />
+            </div>
         </div>
-      </Suspense>
-      <div className="mt-6 flex flex-col items-center">
-        <Suspense fallback={<SuppliersTableSkeleton />}>
-          <div className="w-full bg-white p-6 shadow-md rounded-lg">
-            <Table key={query + currentPage} query={query} currentPage={currentPage} />
-          </div>
-        </Suspense>
-        <div className="mt-6">
-          <Pagination totalPages={totalPages} />
-        </div>
-      </div>
-    </div>
-  );
+    );
 }

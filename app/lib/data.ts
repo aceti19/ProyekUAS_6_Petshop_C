@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql, QueryResult } from '@vercel/postgres';
 import { unstable_noStore as noStore } from 'next/cache';
 
 import {
@@ -9,16 +9,21 @@ import {
   LatestInvoiceRaw,
   User,
   Revenue,
-} from './definitions';
-
-import {
-  ReservationsTable,
-  LatestReservationsRaw,
-  ReservationForm,
   CustomerForm,
+  ProductForm,
 } from './definitions';
+import { SupplierForm, SupplierField, SuppliersTableType } from './definitions'; // Pastikan definisi ini ada dalam definitions
+
 
 import { formatCurrency } from './utils';
+
+type Product = {
+  product_id: string;
+  product_name: string;
+  price: number;
+  stock_quantity: number;
+  category: string;
+};
 
 export async function fetchRevenue() {
   try {
@@ -33,7 +38,6 @@ export async function fetchRevenue() {
     throw new Error('Failed to fetch revenue data.');
   }
 }
- 
 
 export async function fetchLatestInvoices() {
   try {
@@ -54,26 +58,6 @@ export async function fetchLatestInvoices() {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch the latest invoices.');
-  }
-}
-
-export async function fetchLatestReservations() {
-  try {
-    const data = await sql<LatestReservationsRaw>`
-      SELECT reservations.amount, customers.name, customers.image_url, customers.email, reservations.id
-      FROM reservations
-      JOIN customers ON reservations.customer_id = customers.id
-      ORDER BY reservations.date DESC
-      LIMIT 1`;
-
-    const latestReservations = data.rows.map((reservation) => ({
-      ...reservation,
-      amount: formatCurrency(reservation.amount),
-    }));
-    return latestReservations;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest reservations.');
   }
 }
 
@@ -145,42 +129,9 @@ export async function fetchFilteredInvoices(query: string, currentPage: number) 
   }
 }
 
-export async function fetchFilteredReservations(query: string, currentPage: number) {
-  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
-  try {
-    const reservations = await sql<ReservationsTable>`
-      SELECT
-        reservations.id,
-        reservations.amount,
-        reservations.date,
-        reservations.status,
-        customers.name,
-        customers.email,
-        customers.image_url
-      FROM reservations
-      JOIN customers ON reservations.customer_id = customers.id
-      WHERE
-        customers.name ILIKE ${'%' + query + '%'} OR
-        customers.email ILIKE ${'%' + query + '%'} OR
-        reservations.amount::text ILIKE ${'%' + query + '%'} OR
-        reservations.date::text ILIKE ${'%' + query + '%'} OR
-        reservations.status ILIKE ${'%' + query + '%'}
-      ORDER BY reservations.date DESC
-      LIMIT 5
-    `;
-
-    return reservations.rows;
-  } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch reservations.');
-  }
-}
-
 export async function fetchInvoicesPages(query: string) {
   noStore();
   try {
-    
     const count = await sql`SELECT COUNT(*)
     FROM invoices
     JOIN customers ON invoices.customer_id = customers.id
@@ -243,7 +194,6 @@ export async function fetchCustomersPages(query: string) {
   }
 }
 
-
 export async function fetchCustomers() {
   noStore();
   try {
@@ -297,6 +247,7 @@ export async function fetchFilteredCustomers(query: string, currentPage: number)
     throw new Error('Failed to fetch customer table.');
   }
 }
+
 export async function getUser(email: string) {
   try {
     const user = await sql`SELECT * FROM users WHERE email=${email}`;
@@ -307,35 +258,32 @@ export async function getUser(email: string) {
   }
 }
 
-export async function fetchReservationById(id: string) {
-  noStore();
+export async function fetchProductById(id: string): Promise<ProductForm> {
   try {
-    const data = await sql<ReservationForm>`
+    const result: QueryResult<ProductForm> = await sql`
       SELECT
-        reservations.id,
-        reservations.customer_id,
-        reservations.amount,
-        reservations.status,
-        reservations.date
-      FROM reservations
-      WHERE reservations.id = ${id};
+        product_id AS id,
+        product_name AS name,
+        price,
+        stock_quantity,
+        category
+      FROM products
+      WHERE product_id = ${id}
     `;
 
-    const reservation = data.rows.map((reservation) => ({
-      ...reservation,
-      // Convert amount from cents to dollars
-      amount: reservation.amount / 100,
-    }));
-    
-    return reservation[0];
+    if (result.rowCount === 0) {
+      throw new Error('Product not found');
+    }
+
+    return result.rows[0];
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch invoice.');
+    throw new Error('Failed to fetch product.');
   }
 }
 
 export async function fetchCustomersById(id: string) {
-  noStore()
+  noStore();
   try {
     const data = await sql<CustomerForm>`
       SELECT
@@ -353,7 +301,6 @@ export async function fetchCustomersById(id: string) {
     }));
 
     return customers[0];
-
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch customers.');
@@ -383,5 +330,182 @@ export async function fetchInvoiceById(id: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
+  }
+}
+
+export async function fetchProductsPages(query: string): Promise<number> {
+  try {
+    const result: QueryResult<{ count: number }> = await sql`
+      SELECT COUNT(*) as count
+      FROM products
+      WHERE
+        product_name ILIKE ${`%${query}%`} OR
+        CAST(price AS TEXT) ILIKE ${`%${query}%`} OR
+        CAST(stock_quantity AS TEXT) ILIKE ${`%${query}%`} OR
+        category ILIKE ${`%${query}%`}
+    `;
+
+    const totalCount = result.rows[0].count;
+    const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of products.');
+  }
+}
+
+export async function fetchFilteredProducts(query: string, currentPage: number): Promise<Product[]> {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  noStore();
+
+  try {
+    const data = await sql<Product>`
+      SELECT
+        product_id,
+        product_name,
+        price,
+        stock_quantity,
+        category
+      FROM products
+      WHERE
+        product_name ILIKE ${'%' + query + '%'} OR
+        category ILIKE ${'%' + query + '%'} OR
+        CAST(price AS TEXT) ILIKE ${'%' + query + '%'} OR
+        CAST(stock_quantity AS TEXT) ILIKE ${'%' + query + '%'}
+      ORDER BY product_name ASC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch products.');
+  }
+}
+
+
+
+type Supplier = {
+  supplier_id: string;
+  supplier_name: string;
+  contact_person: string;
+  phone_number: string;
+  email: string;
+};
+
+
+
+export async function fetchSuppliersPages(query: string): Promise<number> {
+  try {
+    const result: QueryResult<{ count: number }> = await sql`
+      SELECT COUNT(*) as count
+      FROM suppliers
+      WHERE
+        supplier_name ILIKE ${`%${query}%`} OR
+        contact_person ILIKE ${`%${query}%`} OR
+        phone_number ILIKE ${`%${query}%`} OR
+        email ILIKE ${`%${query}%`}
+    `;
+
+    const totalCount = result.rows[0].count;
+    const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of suppliers.');
+  }
+}
+
+export async function fetchFilteredSuppliers(query: string, currentPage: number): Promise<Supplier[]> {
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  noStore();
+
+  try {
+    const data = await sql<Supplier>`
+      SELECT
+        supplier_id,
+        supplier_name,
+        contact_person,
+        phone_number,
+        email
+      FROM suppliers
+      WHERE
+        supplier_name ILIKE ${'%' + query + '%'} OR
+        contact_person ILIKE ${'%' + query + '%'} OR
+        phone_number ILIKE ${'%' + query + '%'} OR
+        email ILIKE ${'%' + query + '%'}
+      ORDER BY supplier_name ASC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch suppliers.');
+  }
+}
+
+export async function fetchSupplierById(id: string): Promise<SupplierForm> {
+  try {
+    const result: QueryResult<SupplierForm> = await sql`
+      SELECT
+        supplier_id AS id,
+        supplier_name AS name,
+        contact_person,
+        phone_number,
+        email
+      FROM suppliers
+      WHERE supplier_id = ${id}
+    `;
+
+    if (result.rowCount === 0) {
+      throw new Error('Supplier not found');
+    }
+
+    return result.rows[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch supplier.');
+  }
+}
+
+export async function fetchSuppliers() {
+  noStore();
+  try {
+    const data = await sql<SupplierField>`
+      SELECT
+        supplier_id AS id,
+        supplier_name AS name
+      FROM suppliers
+      ORDER BY supplier_name ASC
+    `;
+
+    const suppliers = data.rows;
+    return suppliers;
+  } catch (err) {
+    console.error('Database Error:', err);
+    throw new Error('Failed to fetch all suppliers.');
+  }
+}
+
+
+export async function fetchLatestSuppliers() {
+  try {
+    noStore();
+    const data = await sql<SupplierField>`
+      SELECT supplier_id, supplier_name, contact_person, phone_number, email
+      FROM suppliers
+      ORDER BY supplier_id DESC
+      LIMIT 5;
+    `;
+
+    const latestSuppliers = data.rows.map((supplier) => ({
+      ...supplier,
+    }));
+
+    return latestSuppliers;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch the latest suppliers.');
   }
 }

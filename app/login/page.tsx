@@ -1,25 +1,77 @@
-import Image from 'next/image';
-import LoginForm from '@/app/ui/login-form';
- 
-export default function LoginPage() {
+import { lusitana } from '@/app/ui/fonts';
+import { AtSymbolIcon, KeyIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+
+export default function LoginForm() {
   return (
-    <main className="flex items-center justify-center md:h-screen">
-      <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4 md:-mt-32">
-        <div className="flex h-20 w-full items-end rounded-lg bg-gradient-to-r from-black to-amber-950 p-3 md:h-36">
-        <div className="text-white text-3xl font-bold flex flex-col">
-            
-            <span>Atma</span>
-            <span>Barbershop</span>
-          </div>
-          <Image
-            src="/logo_hero.png"
-            width={70} // Ukuran logo yang diperbesar
-            height={70} // Ukuran logo yang diperbesar
-            alt="Atma Barbershop logo"
-            style={{ marginLeft: 'auto' }} // Menambahkan margin ke kiri secara otomatis
-          />
+    <main 
+      className="relative min-h-screen flex items-center justify-center p-6 leading-normal" 
+      style={{ 
+        background: 'linear-gradient(to bottom right, #FFB0C0, #93B9E7)'
+      }}
+    >
+      <div className="relative z-10 flex items-center justify-between w-full max-w-4xl rounded-lg shadow-lg overflow-hidden" 
+           style={{ 
+             background: 'linear-gradient(45deg, #FFFFFF 0%, rgba(255,255,255,0.5) 100%)'
+           }}>
+
+        {/* Logo section */}
+        <div className="w-1/2 flex items-center justify-center p-8">
+          <img src="/logo_b.png" alt="Logo" className="max-w-full h-auto" /> 
         </div>
-        <LoginForm />
+
+        {/* Form section */}
+        <form className="w-1/2 p-8 flex flex-col"> 
+          <h1 className={`${lusitana.className} mb-4 font-bold text-3xl text-pink-700`}>
+            Login
+          </h1>
+          <p className="mb-4 text-sm text-gray-600">
+            Please login to your account to access our shop.
+          </p>
+          <div className="mb-4 flex flex-col">
+            <label className="block text-xs font-bold text-gray-700" htmlFor="email">
+              Username or Email
+            </label>
+            <div className="relative mt-1 flex-grow"> 
+              <input
+                className="peer block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 text-sm outline-none placeholder-gray-500"
+                id="email"
+                type="email"
+                name="email"
+                placeholder="Enter your username or email"
+                required
+              />
+              <AtSymbolIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+          <div className="mb-4 flex flex-col"> 
+            <label className="block text-xs font-bold text-gray-700" htmlFor="password">
+              Password
+            </label>
+            <div className="relative mt-1 flex-grow"> 
+              <input
+                className="peer block w-full rounded-md border border-gray-300 py-2 pl-10 pr-3 text-sm outline-none placeholder-gray-500"
+                id="password"
+                type="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+              />
+              <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
+            </div>
+          </div>
+          <div className="flex justify-between mb-4">
+            <label className="flex items-center text-sm">
+              <input type="checkbox" name="remember" className="form-checkbox" />
+              <span className="ml-2">Remember me</span>
+            </label>
+          </div>
+          <Link href="/dashboard">
+            <button className="w-full py-2 px-4 bg-pink-700 text-white rounded-md hover:bg-pink-800">
+              Login
+            </button>
+          </Link>
+        </form>
       </div>
     </main>
   );

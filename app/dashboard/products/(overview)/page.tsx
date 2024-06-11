@@ -3,10 +3,10 @@ import Search from '@/app/ui/search';
 import Table from '@/app/ui/products/table';
 import { CreateProduct } from '@/app/ui/products/buttons';
 import { kanit } from '@/app/ui/fonts';
+import { CreateProductSkeleton, ProductsTableSkeleton, SearchSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchProductsPages } from '@/app/lib/data';
 import { Metadata } from 'next';
-import { ProductsTableSkeleton, SearchSkeleton, CreateProductSkeleton, TitleSkeleton } from '@/app/ui/skeletons';
 
 export const metadata: Metadata = {
     title: 'Products',
@@ -24,31 +24,28 @@ export default async function Page({
     const currentPage = Number(searchParams?.page) || 1;
 
     const totalPages = await fetchProductsPages(query);
-
     return (
-        <div className="w-full p-6 bg-gray-100 min-h-screen">
-            <Suspense fallback={<TitleSkeleton />}>
-                <div className="flex flex-col items-center justify-between bg-white p-6 shadow-md rounded-lg">
-                    <h1 className={`${kanit.className} text-3xl mb-4`}>Products</h1>
-                    <div className="flex w-full items-center justify-between gap-4">
-                        <Suspense fallback={<SearchSkeleton />}>
-                            <Search placeholder="Search products..." />
-                        </Suspense>
-                        <Suspense fallback={<CreateProductSkeleton />}>
-                            <CreateProduct />
-                        </Suspense>
-                    </div>
-                </div>
-            </Suspense>
-            <div className="mt-6 flex flex-col items-center">
-                <Suspense fallback={<ProductsTableSkeleton />}>
-                    <div className="w-full bg-white p-6 shadow-md rounded-lg">
-                        <Table key={query + currentPage} query={query} currentPage={currentPage} />
-                    </div>
+        <div className="w-full">
+            <div className="flex w-full items-center justify-between">
+                <h1 className={`${kanit.className} text-2xl`}>Products</h1>
+            </div>
+            <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
+                <Suspense fallback={<SearchSkeleton />}>
+                    <Search placeholder="Search products..." />
                 </Suspense>
-                <div className="mt-6">
-                    <Pagination totalPages={totalPages} />
-                </div>
+                <Suspense fallback={<CreateProductSkeleton />}>
+                    <CreateProduct />
+                </Suspense>
+            </div>
+
+            <Suspense
+                key={query + currentPage}
+                fallback={<ProductsTableSkeleton />}
+            >
+                <Table query={query} currentPage={currentPage} />
+            </Suspense>
+            <div className="mt-5 flex w-full justify-center">
+                <Pagination totalPages={totalPages} />
             </div>
         </div>
     );

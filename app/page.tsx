@@ -1,10 +1,3 @@
-// import AcmeLogo from '@/app/ui/acme-logo';
-// import { ArrowRightIcon } from '@heroicons/react/24/outline';
-// import Link from 'next/link';
-// import styles from '@/app/ui/home.module.css';
-// import { lusitana } from '@/app/ui/fonts';
-// import Image from 'next/image';
-
 import { ArrowRightCircleIcon, UserIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -12,59 +5,55 @@ import { kanit, anton } from '@/app/ui/fonts';
 
 export default function Page() {
   return (
-    <main className='relative min-h-screen flex-col p-6'>
-      
+    <main className="relative min-h-screen flex flex-col" style={{ background: 'linear-gradient(to bottom right, #FFB0C0, #93B9E7)' }}>
       <Image
-        src="/bg_hero.png"
-        layout='fill'
-        objectFit='cover'
-        className='absolute z-0'
-        alt="Screenshots of the dashboard project showing desktop version"
+        src="/ab.png"
+        layout="fill"
+        objectFit="cover"
+        className="absolute z-0 opacity-20"
+        alt="Background image"
       />
 
-      
-      <div className="absolute top-6 left-6 z-10 flex items-center">
-        <div>
-          <Image src="/logo_hero.png" width={40} height={40} alt="Logo" />
+      <header className="relative z-10 flex items-center justify-between p-6 bg-white bg-opacity-30 backdrop-blur-md rounded-b-3xl shadow-lg border-b-2 border-white">
+        <div className="flex items-center space-x-4">
+          <Image src="/logo_b.png" width={60} height={60} alt="Logo" className="rounded-full" />
+          <div className="text-2xl font-bold text-[#FF6F91]">
+            Pet Palooza
+          </div>
         </div>
-        <div className="ml-5 text-white text-xl font-kanit">
-          Atma Barbershop
-        </div>
-      </div>
+        <nav className="flex space-x-4">
+          <Link href="/login" passHref>
+            <div className="flex items-center gap-2 p-2 bg-[#FF6F91] bg-opacity-80 backdrop-blur-md rounded-full shadow-lg cursor-pointer text-white hover:bg-opacity-100 transition-all transform hover:scale-105">
+              <UserIcon className="w-5 h-5 md:w-6 md:h-6" />
+              <span className="hidden md:inline">Log in</span>
+            </div>
+          </Link>
+        </nav>
+      </header>
 
-      <nav className='fixed top-6 right-6'>
-        <div className='flex items-start justify-end'>
-          <p>
-            <Link
-              href="/login"
-              className="flex items-end gap-5 self-start rounded-lg bg-blue-500 bg-opacity-0 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-opacity-20 md:text-base border border-white shadow-none"
-            >
-              <span className="hidden md:flex">Log in</span>
-              <UserIcon className="w-5 md:w-6 md:hidden" />
-            </Link>
-          </p>
+      <section className="relative flex flex-col items-center justify-center flex-grow text-center text-white p-6">
+        <div className="bg-white bg-opacity-20 backdrop-blur-md p-10 rounded-3xl shadow-xl max-w-2xl border-2 border-white">
+          <h1 className={`${kanit.className} text-3xl md:text-5xl font-bold text-[#FF6F91]`}>
+            Paws & Whiskers Petshop
+          </h1>
+          <h2 className={`text-[#FF6F91] font-extrabold text-4xl md:text-6xl ${anton.className} mt-4`}>
+            Welcome to Our PetShop
+          </h2>
+          <h3 className={`text-[#FF6F91] font-extrabold text-3xl md:text-5xl ${anton.className} mt-4`}>
+            PET PALOOZA
+          </h3>
+          <Link href="/dashboard" passHref>
+            <div className="mt-10 inline-flex items-center gap-2 p-4 bg-[#FF6F91] text-white font-bold rounded-full cursor-pointer shadow-lg hover:bg-[#FF8BA3] transition-all transform hover:scale-105">
+              <span>Dashboard</span>
+              <ArrowRightCircleIcon className="w-6 h-6" />
+            </div>
+          </Link>
         </div>
-      </nav>
+      </section>
 
-      <div className='absolute bottom-14 left-6 md:bottom-48 md:left-40'>
-        <div className=' mt-4 flex-grow flex-col gap-4 md:flex-row'>
-          <p className={`${kanit.className} text-lg text-white md:text-2xl md:leading-normal mb-10`}>
-            <strong className={`${kanit.className} text-lg text-white md:text-2xl md:leading-normal mt-10 mb-10`}>221711848 - Jimmy Raymond Wijaya</strong> {' '}
-            <a href="" className={`text-white font-bold text-8xl ${anton.className} mt-10 mb-10`}>
-              <br></br><strong className={`text-white font-bold text-8xl ${anton.className} mb-10`}>Our Barbershop</strong>
-            </a>
-            <br></br><strong className={`text-white font-bold text-8xl ${anton.className} mb-10`}>Admin Dashboard</strong>
-            <a
-            href= "/dashboard">
-            <h1
-              className={`${kanit.className} antialiased flex text-whitetext-[20px] hover:text-teal-500`}>
-              Go to Dashboard
-            <ArrowRightCircleIcon className='w-6 mx-2'/>
-            </h1>
-            </a>
-          </p>
-        </div>
-      </div>
+      <footer className="relative z-10 flex justify-center p-4 bg-white bg-opacity-30 backdrop-blur-md rounded-t-3xl shadow-lg border-t-2 border-white">
+        <div className="text-[#FF6F91]">© 2023 Pet Palooza. All rights reserved.</div>
+      </footer>
     </main>
   );
 }

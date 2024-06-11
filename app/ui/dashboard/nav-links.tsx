@@ -2,7 +2,6 @@ import {
   UserGroupIcon,
   HomeIcon,
   DocumentDuplicateIcon,
-  ClipboardDocumentCheckIcon,
   ArchiveBoxIcon, // Assuming you use this icon for Products
   TruckIcon // Assuming you use this icon for Suppliers
 } from '@heroicons/react/24/outline';
@@ -15,7 +14,6 @@ const links = [
     icon: DocumentDuplicateIcon,
   },
   { name: 'Customers', href: '/dashboard/customers', icon: UserGroupIcon },
-  { name: 'Reservations', href: '/dashboard/reservations', icon: ClipboardDocumentCheckIcon },
   { name: 'Products', href: '/dashboard/products', icon: ArchiveBoxIcon },
   { name: 'Suppliers', href: '/dashboard/suppliers', icon: TruckIcon },
 ];
@@ -29,7 +27,7 @@ export default function NavLinks() {
           <a
             key={link.name}
             href={link.href}
-            className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3"
+            className="flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-black-500 p-3 text-sm font-medium hover:bg-pink-600 text-white md:flex-none md:justify-start md:p-2 md:px-3"
           >
             <LinkIcon className="w-6" />
             <p className="hidden md:block">{link.name}</p>
