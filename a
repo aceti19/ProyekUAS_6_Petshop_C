@@ -1,0 +1,396 @@
+[33mcommit 61fd90d32e1c9c97b2328dbbbc7a0574c17120f2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mjimi[m[33m)[m
+Author: aceti19 <jimmyrw703@gmail>
+Date:   Tue Jun 4 12:41:08 2024 +0700
+
+    fetch,mutating
+
+[1mdiff --git a/app/dashboard/products/(overview)/[id]/edit/not-found.tsx b/app/dashboard/products/(overview)/[id]/edit/not-found.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..930df12[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/products/(overview)/[id]/edit/not-found.tsx[m
+[36m@@ -0,0 +1,18 @@[m
+[32m+[m[32mimport Link from 'next/link';[m
+[32m+[m[32mimport { FaceFrownIcon } from '@heroicons/react/24/outline';[m
+[32m+[m[41m [m
+[32m+[m[32mexport default function NotFound() {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <main className="flex h-full flex-col items-center justify-center gap-2">[m
+[32m+[m[32m      <FaceFrownIcon className="w-10 text-gray-400" />[m
+[32m+[m[32m      <h2 className="text-xl font-semibold">404 Not Found</h2>[m
+[32m+[m[32m      <p>Could not find the requested product.</p>[m
+[32m+[m[32m      <Link[m
+[32m+[m[32m        href="/dashboard/reservations"[m
+[32m+[m[32m        className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"[m
+[32m+[m[32m      >[m
+[32m+[m[32m        Go Back[m
+[32m+[m[32m      </Link>[m
+[32m+[m[32m    </main>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/app/dashboard/products/(overview)/[id]/edit/page.tsx b/app/dashboard/products/(overview)/[id]/edit/page.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..27b1afe[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/products/(overview)/[id]/edit/page.tsx[m
+[36m@@ -0,0 +1,25 @@[m
+[32m+[m[32mimport Form from '@/app/ui/products/edit-form';[m
+[32m+[m[32mimport Breadcrumbs from '@/app/ui/products/breadcrumbs';[m
+[32m+[m[32mimport { fetchProductById } from '@/app/lib/data';[m
+[32m+[m
+[32m+[m[32mexport default async function Page({ params }: { params: { id: string } }) {[m
+[32m+[m[32m    const id = params.id;[m
+[32m+[m[32m    const [product] = await Promise.all([[m
+[32m+[m[32m        fetchProductById(id)[m
+[32m+[m[32m    ]);[m
+[32m+[m[32m    return ([m
+[32m+[m[32m        <main>[m
+[32m+[m[32m            <Breadcrumbs[m
+[32m+[m[32m                breadcrumbs={[[m
+[32m+[m[32m                    { label: 'Products', href: '/dashboard/products' },[m
+[32m+[m[32m                    {[m
+[32m+[m[32m                        label: 'Edit Product',[m
+[32m+[m[32m                        href: `/dashboard/products/${id}/edit`,[m
+[32m+[m[32m                        active: true,[m
+[32m+[m[32m                    },[m
+[32m+[m[32m                ]}[m
+[32m+[m[32m            />[m
+[32m+[m[32m            <Form product={product} />[m
+[32m+[m[32m        </main>[m
+[32m+[m[32m    );[m
+[32m+[m[32m}[m
+[1mdiff --git a/app/dashboard/products/(overview)/loading.tsx b/app/dashboard/products/(overview)/loading.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..efb6f01[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/products/(overview)/loading.tsx[m
+[36m@@ -0,0 +1,12 @@[m
+[32m+[m[32mimport React from 'react';[m
+[32m+[m[32mimport {DashboardProductSkeleton} from '@/app/ui/skeletons';[m
+[32m+[m
+[32m+[m[32mexport default function Loading() {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <>[m
+[32m+[m[32m      <DashboardProductSkeleton />[m[41m [m
+[32m+[m[32m    </>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[41m    [m
+\ No newline at end of file[m
+[1mdiff --git a/app/dashboard/products/(overview)/page.tsx b/app/dashboard/products/(overview)/page.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..d718677[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/products/(overview)/page.tsx[m
+[36m@@ -0,0 +1,55 @@[m
+[32m+[m[32mimport Pagination from '@/app/ui/products/pagination';[m
+[32m+[m[32mimport Search from '@/app/ui/search';[m
+[32m+[m[32mimport Table from '@/app/ui/products/table';[m
+[32m+[m[32mimport { CreateProduct } from '@/app/ui/products/buttons';[m
+[32m+[m[32mimport { kanit } from '@/app/ui/fonts';[m
+[32m+[m[32mimport { Suspense } from 'react';[m
+[32m+[m[32mimport { fetchProductsPages } from '@/app/lib/data';[m
+[32m+[m[32mimport { Metadata } from 'next';[m
+[32m+[m[32mimport { ProductsTableSkeleton, SearchSkeleton, CreateProductSkeleton, TitleSkeleton } from '@/app/ui/skeletons';[m
+[32m+[m
+[32m+[m[32mexport const metadata: Metadata = {[m
+[32m+[m[32m    title: 'Products',[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mexport default async function Page({[m
+[32m+[m[32m    searchParams,[m
+[32m+[m[32m}: {[m
+[32m+[m[32m    searchParams?: {[m
+[32m+[m[32m        query?: string;[m
+[32m+[m[32m        page?: string;[m
+[32m+[m[32m    };[m
+[32m+[m[32m}) {[m
+[32m+[m[32m    const query = searchParams?.query || '';[m
+[32m+[m[32m    const currentPage = Number(searchParams?.page) || 1;[m
+[32m+[m
+[32m+[m[32m    const totalPages = await fetchProductsPages(query);[m
+[32m+[m
+[32m+[m[32m    return ([m
+[32m+[m[32m        <div className="w-full p-6 bg-gray-100 min-h-screen">[m
+[32m+[m[32m            <Suspense fallback={<TitleSkeleton />}>[m
+[32m+[m[32m                <div className="flex flex-col items-center justify-between bg-white p-6 shadow-md rounded-lg">[m
+[32m+[m[32m                    <h1 className={`${kanit.className} text-3xl mb-4`}>Products</h1>[m
+[32m+[m[32m                    <div className="flex w-full items-center justify-between gap-4">[m
+[32m+[m[32m                        <Suspense fallback={<SearchSkeleton />}>[m
+[32m+[m[32m                            <Search placeholder="Search products..." />[m
+[32m+[m[32m                        </Suspense>[m
+[32m+[m[32m                        <Suspense fallback={<CreateProductSkeleton />}>[m
+[32m+[m[32m                            <CreateProduct />[m
+[32m+[m[32m                        </Suspense>[m
+[32m+[m[32m                    </div>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m            </Suspense>[m
+[32m+[m[32m            <div className="mt-6 flex flex-col items-center">[m
+[32m+[m[32m                <Suspense fallback={<ProductsTableSkeleton />}>[m
+[32m+[m[32m                    <div className="w-full bg-white p-6 shadow-md rounded-lg">[m
+[32m+[m[32m                        <Table key={query + currentPage} query={query} currentPage={currentPage} />[m
+[32m+[m[32m                    </div>[m
+[32m+[m[32m                </Suspense>[m
+[32m+[m[32m                <div className="mt-6">[m
+[32m+[m[32m                    <Pagination totalPages={totalPages} />[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m    );[m
+[32m+[m[32m}[m
+[1mdiff --git a/app/dashboard/suppliers/(overview)/[id]/edit/not-found.tsx b/app/dashboard/suppliers/(overview)/[id]/edit/not-found.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0cdcf9a[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/suppliers/(overview)/[id]/edit/not-found.tsx[m
+[36m@@ -0,0 +1,18 @@[m
+[32m+[m[32mimport Link from 'next/link';[m
+[32m+[m[32mimport { FaceFrownIcon } from '@heroicons/react/24/outline';[m
+[32m+[m[41m [m
+[32m+[m[32mexport default function NotFound() {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <main className="flex h-full flex-col items-center justify-center gap-2">[m
+[32m+[m[32m      <FaceFrownIcon className="w-10 text-gray-400" />[m
+[32m+[m[32m      <h2 className="text-xl font-semibold">404 Not Found</h2>[m
+[32m+[m[32m      <p>Could not find the requested supplier.</p>[m
+[32m+[m[32m      <Link[m
+[32m+[m[32m        href="/dashboard/suppliers"[m
+[32m+[m[32m        className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"[m
+[32m+[m[32m      >[m
+[32m+[m[32m        Go Back[m
+[32m+[m[32m      </Link>[m
+[32m+[m[32m    </main>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/app/dashboard/suppliers/(overview)/[id]/edit/page.tsx b/app/dashboard/suppliers/(overview)/[id]/edit/page.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b99d15e[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/suppliers/(overview)/[id]/edit/page.tsx[m
+[36m@@ -0,0 +1,25 @@[m
+[32m+[m[32mimport Form from '@/app/ui/suppliers/edit-form'; // Pastikan path benar untuk form edit supplier[m
+[32m+[m[32mimport Breadcrumbs from '@/app/ui/suppliers/breadcrumbs'; // Sesuaikan path jika perlu[m
+[32m+[m[32mimport { fetchSupplierById } from '@/app/lib/data'; // Pastikan fungsi fetchSupplierById ada[m
+[32m+[m
+[32m+[m[32mexport default async function Page({ params }: { params: { id: string } }) {[m
+[32m+[m[32m  const id = params.id;[m
+[32m+[m[32m  const supplier = await fetchSupplierById(id); // Pastikan fungsi ini diimplementasikan untuk fetch supplier berdasarkan ID[m
+[32m+[m
+[32m+[m[41m  [m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <main>[m
+[32m+[m[32m      <Breadcrumbs[m
+[32m+[m[32m        breadcrumbs={[[m
+[32m+[m[32m          { label: 'Suppliers', href: '/dashboard/suppliers' }, // Perbarui label dan href[m
+[32m+[m[32m          {[m
+[32m+[m[32m            label: 'Edit Supplier', // Perbarui label[m
+[32m+[m[32m            href: `/dashboard/suppliers/${id}/edit`, // Perbarui href[m
+[32m+[m[32m            active: true,[m
+[32m+[m[32m          },[m
+[32m+[m[32m        ]}[m
+[32m+[m[32m      />[m
+[32m+[m[32m      <Form supplier={supplier} /> {/* Perbarui prop dari reservation menjadi supplier */}[m
+[32m+[m[32m    </main>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[1mdiff --git a/app/dashboard/suppliers/(overview)/loading.tsx b/app/dashboard/suppliers/(overview)/loading.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..dcaca1a[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/suppliers/(overview)/loading.tsx[m
+[36m@@ -0,0 +1,12 @@[m
+[32m+[m[32mimport React from 'react';[m
+[32m+[m[32mimport {DashboardSupplierSkeleton} from '@/app/ui/skeletons';[m
+[32m+[m
+[32m+[m[32mexport default function Loading() {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <>[m
+[32m+[m[32m      <DashboardSupplierSkeleton />[m[41m [m
+[32m+[m[32m    </>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[41m    [m
+\ No newline at end of file[m
+[1mdiff --git a/app/dashboard/suppliers/(overview)/page.tsx b/app/dashboard/suppliers/(overview)/page.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1105bcd[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/suppliers/(overview)/page.tsx[m
+[36m@@ -0,0 +1,55 @@[m
+[32m+[m[32mimport Pagination from '@/app/ui/suppliers/pagination';[m
+[32m+[m[32mimport Search from '@/app/ui/search';[m
+[32m+[m[32mimport Table from '@/app/ui/suppliers/table';[m
+[32m+[m[32mimport { CreateSupplier } from '@/app/ui/suppliers/buttons';[m
+[32m+[m[32mimport { lusitana } from '@/app/ui/fonts';[m
+[32m+[m[32mimport { Suspense } from 'react';[m
+[32m+[m[32mimport { fetchSuppliersPages } from '@/app/lib/data';[m
+[32m+[m[32mimport { SuppliersTableSkeleton, SearchSkeleton, CreateSupplierSkeleton } from '@/app/ui/skeletons';[m
+[32m+[m[32mimport { Metadata } from 'next';[m
+[32m+[m
+[32m+[m[32mexport const metadata: Metadata = {[m
+[32m+[m[32m  title: 'Suppliers',[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mexport default async function Page({[m
+[32m+[m[32m  searchParams,[m
+[32m+[m[32m}: {[m
+[32m+[m[32m  searchParams?: {[m
+[32m+[m[32m    query?: string;[m
+[32m+[m[32m    page?: string;[m
+[32m+[m[32m  };[m
+[32m+[m[32m}) {[m
+[32m+[m[32m  const query = searchParams?.query || '';[m
+[32m+[m[32m  const currentPage = Number(searchParams?.page) || 1;[m
+[32m+[m
+[32m+[m[32m  const totalPages = await fetchSuppliersPages(query);[m
+[32m+[m[41m  [m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div className="w-full p-6 bg-gray-100 min-h-screen">[m
+[32m+[m[32m      <Suspense fallback={<div className="flex w-full items-center justify-between bg-white p-6 shadow-md rounded-lg"><div className={`${lusitana.className} text-3xl mb-4`}>Loading...</div></div>}>[m
+[32m+[m[32m        <div className="flex flex-col items-center justify-between bg-white p-6 shadow-md rounded-lg">[m
+[32m+[m[32m          <h1 className={`${lusitana.className} text-3xl mb-4`}>Suppliers</h1>[m
+[32m+[m[32m          <div className="flex w-full items-center justify-between gap-4">[m
+[32m+[m[32m            <Suspense fallback={<SearchSkeleton />}>[m
+[32m+[m[32m              <Search placeholder="Search suppliers..." />[m
+[32m+[m[32m            </Suspense>[m
+[32m+[m[32m            <Suspense fallback={<CreateSupplierSkeleton />}>[m
+[32m+[m[32m              <CreateSupplier />[m
+[32m+[m[32m            </Suspense>[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m      </Suspense>[m
+[32m+[m[32m      <div className="mt-6 flex flex-col items-center">[m
+[32m+[m[32m        <Suspense fallback={<SuppliersTableSkeleton />}>[m
+[32m+[m[32m          <div className="w-full bg-white p-6 shadow-md rounded-lg">[m
+[32m+[m[32m            <Table key={query + currentPage} query={query} currentPage={currentPage} />[m
+[32m+[m[32m          </div>[m
+[32m+[m[32m        </Suspense>[m
+[32m+[m[32m        <div className="mt-6">[m
+[32m+[m[32m          <Pagination totalPages={totalPages} />[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m      </div>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[1mdiff --git a/app/dashboard/suppliers/error.tsx b/app/dashboard/suppliers/error.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e285214[m
+[1m--- /dev/null[m
+[1m+++ b/app/dashboard/suppliers/error.tsx[m
+[36m@@ -0,0 +1,31 @@[m
+[32m+[m[32m'use client';[m
+[32m+[m[41m [m
+[32m+[m[32mimport { useEffect } from 'react';[m
+[32m+[m[41m [m
+[32m+[m[32mexport default function Error({[m
+[32m+[m[32m  error,[m
+[32m+[m[32m  reset,[m
+[32m+[m[32m}: {[m
+[32m+[m[32m  error: Error & { digest?: string };[m
+[32m+[m[32m  reset: () => void;[m
+[32m+[m[32m}) {[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    // Optionally log the error to an error reporting service[m
+[32m+[m[32m    console.error(error);[m
+[32m+[m[32m  }, [error]);[m
+[32m+[m[41m [m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <main className="flex h-full flex-col items-center justify-center">[m
+[32m+[m[32m      <h2 className="text-center">Something went wrong!</h2>[m
+[32m+[m[32m      <button[m
+[32m+[m[32m        className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"[m
+[32m+[m[32m        onClick={[m
+[32m+[m[32m          // Attempt to recover by trying to re-render the invoices route[m
+[32m+[m[32m          () => reset()[m
+[32m+[m[32m        }[m
+[32m+[m[32m      >[m
+[32m+[m[32m        Try again[m
+[32m+[m[32m      </button>[m
+[32m+[m[32m    </main>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+\ No newline at end of file[m
+[1mdiff --git a/app/ui/dashboard/latest-suppliers.tsx b/app/ui/dashboard/latest-suppliers.tsx[m
+[1mnew file mode 100644[m
+[1mindex 0000000..21af263[m
+[1m--- /dev/null[m
+[1m+++ b/app/ui/dashboard/latest-suppliers.tsx[m
+[36m@@ -0,0 +1,54 @@[m
+[32m+[m[32mimport { ArrowPathIcon } from '@heroicons/react/24/outline';[m
+[32m+[m[32mimport clsx from 'clsx';[m
+[32m+[m[32mimport { lusitana } from '@/app/ui/fonts';[m
+[32m+[m[32mimport { LatestSuppliers } from '@/app/lib/definitions'; // Adjust this import according to your actual data structure[m
+[32m+[m
+[32m+[m[32mexport default function LatestSuppliersComponent({[m
+[32m+[m[32m  latestSuppliers,[m
+[32m+[m[32m}: {[m
+[32m+[m[32m  latestSuppliers: LatestSuppliers[]; // Ensure this type matches your supplier data structure[m
+[32m+[m[32m}) {[m
+[32m+[m[32m  return ([m
+[32m+[m[32m    <div className="flex w-full flex-col md:col-span-4">[m
+[32m+[m[32m      <h2 className={`${lusitana.className} mb-4 text-xl md:text-2xl`}>[m
+[32m+[m[32m        Latest Suppliers[m
+[32m+[m[32m      </h2>[m
+[32m+[m[32m      <div className="flex grow flex-col justify-between rounded-xl bg-gray-50 p-4">[m
+[32m+[m[32m        <div className="bg-white px-6">[m
+[32m+[m[32m          {latestSuppliers.map((supplier, i) => {[m
+[32m+[m[32m            return ([m
+[32m+[m[32m              <div[m
+[32m+[m[32m                key={supplier.id}[m
+[32m+[m[32m                className={clsx([m
+[32m+[m[32m                  'flex flex-row items-center justify-between py-4',[m
+[32m+[m[32m                  {[m
+[32m+[m[32m                    'border-t': i !== 0,[m
+[32m+[m[32m                  },[m
+[32m+[m[32m                )}[m
+[32m+[m[32m              >[m
+[32m+[m[32m                <div className="flex flex-col min-w-0">[m
+[32m+[m[32m                  <p className="truncate text-sm font-semibold md:text-base">[m
+[32m+[m[32m                    {supplier.supplier_name}[m
+[32m+[m[32m                  </p>[m
+[32m+[m[32m                  <p className="truncate text-sm text-gray-500 md:text-base">[m
+[32m+[m[32m                    {supplier.contact_person}[m
+[32m+[m[32m                  </p>[m
+[32m+[m[32m                  <p className="truncate text-sm text-gray-500 md:text-base">[m
+[32m+[m[32m                    {supplier.phone_number}[m
+[32m+[m[32m                  </p>[m
+[32m+[m[32m                  <p className="hidden text-sm text-gray-500 sm:block">[m
+[32m+[m[32m                    {supplier.email}[m
+[32m+[m[32m                  </p>[m
+[32m+[m[32m                </div>[m
+[32m+[m[32m              </div>[m
+[32m+[m[32m            );[m
+[32m+[m[32m          })}[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m        <div className="flex items-center pb-2 pt-6">[m
+[32m+[m[32m          <ArrowPathIcon className="h-5 w-5 text-gray-500" />[m
+[32m+[m[32m          <h3 className="ml-2 text-sm text-gray-500">Updated just now</h3>[m
+[32m+[m[32m        </div>[m
+[32m+[m[32m      </div>[m
+[32m+[m[32m    </div>[m
+[32m+[m[32m  );[m
+[32m+[m[32m}[m
+[1mdiff --git a/public/a.png b/public/a.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..248e4d4[m
+Binary files /dev/null and b/public/a.png differ
+[1mdiff --git a/public/ab.png b/public/ab.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f3874be[m
+Binary files /dev/null and b/public/ab.png differ
+[1mdiff --git a/public/as.png b/public/as.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..f6ee6be[m
+Binary files /dev/null and b/public/as.png differ
+[1mdiff --git a/public/logo_a.png b/public/logo_a.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..bf4ce6f[m
+Binary files /dev/null and b/public/logo_a.png differ
+[1mdiff --git a/public/logo_b.png b/public/logo_b.png[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e5830e2[m
+Binary files /dev/null and b/public/logo_b.png differ

@@ -27,7 +27,7 @@ export default async function RevenueChart() { // Make component async, remove t
       </h2>
       {/* NOTE: comment in this code when you get to this point in the course */}
 
-      <div className="rounded-xl bg-gray-50 p-4">
+      <div className="rounded-xl bg-gradient-to-r from-[#FFC1CC] to-[#A7C7E7] p-4">
         <div className="sm:grid-cols-13 mt-0 grid grid-cols-12 items-end gap-2 rounded-md bg-white p-4 md:gap-4">
           <div
             className="mb-6 hidden flex-col justify-between text-sm text-gray-400 sm:flex"
@@ -41,7 +41,7 @@ export default async function RevenueChart() { // Make component async, remove t
           {revenue.map((month) => (
             <div key={month.month} className="flex flex-col items-center gap-2">
               <div
-                className="w-full rounded-md bg-blue-300"
+                className="w-full rounded-md bg-gradient-to-r from-[#FFB0C0] to-[#93B9E7]"
                 style={{
                   height: `${(chartHeight / topLabel) * month.revenue}px`,
                 }}
